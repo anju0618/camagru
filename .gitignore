@@ -1,0 +1,26 @@
+# secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# dependencies / build
+node_modules/
+vendor/
+*.log
+
+# uploads and runtime data
+uploads/
+data/
+*.sqlite
+*.db
+
+# docker volumes
+db_data/
+
+# editors / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
