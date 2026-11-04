@@ -2,7 +2,7 @@
 declare(strict_types=1);
 require __DIR__ . '/../src/bootstrap.php';
 
-$row = q('SELECT file FROM images WHERE id = ?', [(int) ($_GET['id'] ?? 0)])->fetch();
+$row = db_query('SELECT file FROM images WHERE id = ?', [(int) ($_GET['id'] ?? 0)])->fetch();
 $path = $row ? IMG_DIR . '/' . basename($row['file']) : '';
 if (!$row || !is_file($path)) {
     http_response_code(404);

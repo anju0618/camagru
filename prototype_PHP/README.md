@@ -46,7 +46,7 @@ docker/          php.ini と Apache の設定
 ## 課題要件との対応(セキュリティ)
 
 - パスワード: bcrypt(塩付き)。ログイン連続失敗で 5 分ロック。
-- SQL インジェクション: すべて `q()` 経由のプリペアドステートメント。
+- SQL インジェクション: すべて `db_query()` 経由のプリペアドステートメント。
 - XSS: 出力は `e()`(`htmlspecialchars`)+ CSP(インラインのスクリプト・スタイルなし)。
 - CSRF: セッション紐づけトークンを全 POST で `hash_equals` 検証。
 - アップロード: PNG / JPEG のみ(中身を `getimagesizefromstring` で判定)。GD で読み直して PNG として保存し直す。ファイル名はランダム。保存先は DocumentRoot の外(`/var/www/data`)。

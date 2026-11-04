@@ -4,7 +4,7 @@ require __DIR__ . '/../src/bootstrap.php';
 
 if (is_post()) {
     check_csrf();
-    $user = q('SELECT * FROM users WHERE email = ? AND verified = 1', [trim(post('email'))])->fetch();
+    $user = db_query('SELECT * FROM users WHERE email = ? AND verified = 1', [trim(post('email'))])->fetch();
     if ($user) {
         $token = make_token((int) $user['id'], 'reset', 3600);
         send_mail($user['email'], 'Reset your Camagru password',

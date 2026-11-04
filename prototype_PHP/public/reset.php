@@ -16,7 +16,7 @@ if (is_post()) {
     }
     if (!$error) {
         $userId = use_token($token, 'reset');
-        q('UPDATE users SET password_hash = ?, fail_count = 0, locked_until = 0 WHERE id = ?',
+        db_query('UPDATE users SET password_hash = ?, fail_count = 0, locked_until = 0 WHERE id = ?',
             [password_hash($password, PASSWORD_DEFAULT), $userId]);
         flash('Password changed. Please log in.');
         redirect('/login.php');

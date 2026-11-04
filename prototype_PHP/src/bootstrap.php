@@ -93,7 +93,7 @@ function db(): PDO
 }
 
 /** Run a prepared statement. Every query in this app goes through here. */
-function q(string $sql, array $params = []): PDOStatement
+function db_query(string $sql, array $params = []): PDOStatement
 {
     $st = db()->prepare($sql);
     $st->execute($params);
@@ -157,7 +157,7 @@ function current_user(): ?array
     if ($user === false) {
         $user = null;
         if (!empty($_SESSION['uid'])) {
-            $row = q('SELECT * FROM users WHERE id = ?', [$_SESSION['uid']])->fetch();
+            $row = db_query('SELECT * FROM users WHERE id = ?', [$_SESSION['uid']])->fetch();
             // A password change anywhere else logs this session out.
             if ($row && hash_equals(pw_fingerprint($row['password_hash']), $_SESSION['pwf'] ?? '')) {
                 $user = $row;
@@ -226,14 +226,14 @@ function check_password(string $pw, string $username = '', string $email = ''): 
 function make_token(int $userId, string $kind, int $ttl): string
 {
     $token = bin2hex(random_bytes(32));
-    q('INSERT INTO tokens (user_id, kind, token_hash, expires_at) VALUES (?, ?, ?, ?)',
+    db_query('INSERT INTO tokens (user_id, kind, token_hash, expires_at) VALUES (?, ?, ?, ?)',
         [$userId, $kind, hash('sha256', $token), time() + $ttl]);
     return $token;
 }
 
 function peek_token(string $token, string $kind): ?array
 {
-    $row = q('SELECT * FROM tokens WHERE token_hash = ? AND kind = ? AND used = 0 AND expires_at > ?',
+    $row = db_query('SELECT * FROM tokens WHERE token_hash = ? AND kind = ? AND used = 0 AND expires_at > ?',
         [hash('sha256', $token), $kind, time()])->fetch();
     return $row ?: null;
 }
@@ -245,6 +245,6 @@ function use_token(string $token, string $kind): ?int
     if (!$row) {
         return null;
     }
-    q('UPDATE tokens SET used = 1 WHERE id = ?', [$row['id']]);
+    db_query('UPDATE tokens SET used = 1 WHERE id = ?', [$row['id']]);
     return (int) $row['user_id'];
 }

@@ -46,6 +46,6 @@ try {
 } catch (RuntimeException $ex) {
     json_out(['error' => $ex->getMessage()], 400);
 }
-q('INSERT INTO images (user_id, file, created_at) VALUES (?, ?, ?)', [$user['id'], $file, time()]);
+db_query('INSERT INTO images (user_id, file, created_at) VALUES (?, ?, ?)', [$user['id'], $file, time()]);
 $id = (int) db()->lastInsertId();
 json_out(['id' => $id, 'url' => '/image.php?id=' . $id, 'img' => '/img.php?id=' . $id]);

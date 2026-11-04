@@ -3,7 +3,7 @@ declare(strict_types=1);
 require __DIR__ . '/../src/bootstrap.php';
 
 $id = (int) ($_GET['id'] ?? 0);
-$img = q('SELECT i.*, u.username,
+$img = db_query('SELECT i.*, u.username,
             (SELECT COUNT(*) FROM likes l WHERE l.image_id = i.id) AS likes
           FROM images i JOIN users u ON u.id = i.user_id WHERE i.id = ?', [$id])->fetch();
 if (!$img) {
@@ -16,8 +16,8 @@ if (is_post()) {
     $user = require_login();
     switch (post('action')) {
         case 'like':
-            if (q('DELETE FROM likes WHERE user_id = ? AND image_id = ?', [$user['id'], $id])->rowCount() === 0) {
-                q('INSERT OR IGNORE INTO likes (user_id, image_id) VALUES (?, ?)', [$user['id'], $id]);
+            if (db_query('DELETE FROM likes WHERE user_id = ? AND image_id = ?', [$user['id'], $id])->rowCount() === 0) {
+                db_query('INSERT OR IGNORE INTO likes (user_id, image_id) VALUES (?, ?)', [$user['id'], $id]);
             }
             redirect($self);
         case 'comment':
@@ -26,9 +26,9 @@ if (is_post()) {
                 flash('A comment must be 1-500 characters.', 'err');
                 redirect($self);
             }
-            q('INSERT INTO comments (image_id, user_id, body, created_at) VALUES (?, ?, ?, ?)',
+            db_query('INSERT INTO comments (image_id, user_id, body, created_at) VALUES (?, ?, ?, ?)',
                 [$id, $user['id'], $body, time()]);
-            $owner = q('SELECT * FROM users WHERE id = ?', [$img['user_id']])->fetch();
+            $owner = db_query('SELECT * FROM users WHERE id = ?', [$img['user_id']])->fetch();
             if ($owner['notify'] && (int) $owner['id'] !== (int) $user['id']) {
                 send_mail($owner['email'], 'New comment on your photo',
                     $user['username'] . " commented on your photo:\n\n$body\n\n" . base_url() . "$self\n");
@@ -39,7 +39,7 @@ if (is_post()) {
             if ((int) $img['user_id'] !== (int) $user['id']) {
                 fail(403, 'You can only delete your own photos.');
             }
-            q('DELETE FROM images WHERE id = ?', [$id]);
+            db_query('DELETE FROM images WHERE id = ?', [$id]);
             @unlink(IMG_DIR . '/' . basename($img['file']));
             flash('Photo deleted.');
             redirect('/editor.php');
@@ -49,9 +49,9 @@ if (is_post()) {
 }
 
 $user = current_user();
-$comments = q('SELECT c.body, c.created_at, u.username FROM comments c
+$comments = db_query('SELECT c.body, c.created_at, u.username FROM comments c
                JOIN users u ON u.id = c.user_id WHERE c.image_id = ? ORDER BY c.created_at, c.id', [$id])->fetchAll();
-$liked = $user && q('SELECT 1 FROM likes WHERE user_id = ? AND image_id = ?', [$user['id'], $id])->fetch();
+$liked = $user && db_query('SELECT 1 FROM likes WHERE user_id = ? AND image_id = ?', [$user['id'], $id])->fetch();
 render_header('Photo');
 ?>
 <section class="card"><h1>Photo by <?= e($img['username']) ?></h1>

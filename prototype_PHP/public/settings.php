@@ -16,7 +16,7 @@ if (is_post()) {
             $error = 'The two passwords do not match.';
         } else {
             $hash = password_hash($new, PASSWORD_DEFAULT);
-            q('UPDATE users SET password_hash = ? WHERE id = ?', [$hash, $user['id']]);
+            db_query('UPDATE users SET password_hash = ? WHERE id = ?', [$hash, $user['id']]);
             $_SESSION['pwf'] = pw_fingerprint($hash); // keep this session, drop the others
             flash('Password changed.');
         }
@@ -24,7 +24,7 @@ if (is_post()) {
         $username = trim(post('username'));
         $email = trim(post('email'));
         $error = check_username($username) ?? check_email($email);
-        if (!$error && q('SELECT 1 FROM users WHERE (username = ? OR email = ?) AND id <> ?',
+        if (!$error && db_query('SELECT 1 FROM users WHERE (username = ? OR email = ?) AND id <> ?',
                 [$username, $email, $user['id']])->fetch()) {
             $error = 'That username or email is already taken.';
         }
@@ -33,7 +33,7 @@ if (is_post()) {
             $error = 'Enter your current password to change your email.';
         }
         if (!$error) {
-            q('UPDATE users SET username = ?, email = ?, notify = ? WHERE id = ?',
+            db_query('UPDATE users SET username = ?, email = ?, notify = ? WHERE id = ?',
                 [$username, $email, post('notify') === '1' ? 1 : 0, $user['id']]);
             flash('Settings saved.');
         }

@@ -2,10 +2,10 @@
 declare(strict_types=1);
 require __DIR__ . '/../src/bootstrap.php';
 
-$total = (int) q('SELECT COUNT(*) FROM images')->fetchColumn();
+$total = (int) db_query('SELECT COUNT(*) FROM images')->fetchColumn();
 $pages = max(1, (int) ceil($total / PER_PAGE));
 $page = min(max((int) ($_GET['page'] ?? 1), 1), $pages);
-$rows = q('SELECT i.id, i.created_at, u.username,
+$rows = db_query('SELECT i.id, i.created_at, u.username,
              (SELECT COUNT(*) FROM likes l WHERE l.image_id = i.id) AS likes,
              (SELECT COUNT(*) FROM comments c WHERE c.image_id = i.id) AS comments
            FROM images i JOIN users u ON u.id = i.user_id

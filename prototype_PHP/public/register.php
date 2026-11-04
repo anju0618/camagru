@@ -12,12 +12,12 @@ if (is_post()) {
     if (!$error && $password !== post('confirm')) {
         $error = 'The two passwords do not match.';
     }
-    if (!$error && q('SELECT 1 FROM users WHERE username = ? OR email = ?', [$username, $email])->fetch()) {
+    if (!$error && db_query('SELECT 1 FROM users WHERE username = ? OR email = ?', [$username, $email])->fetch()) {
         $error = 'That username or email is already taken.';
     }
     if (!$error) {
         try {
-            q('INSERT INTO users (username, email, password_hash, created_at) VALUES (?, ?, ?, ?)',
+            db_query('INSERT INTO users (username, email, password_hash, created_at) VALUES (?, ?, ?, ?)',
                 [$username, $email, password_hash($password, PASSWORD_DEFAULT), time()]);
             $id = (int) db()->lastInsertId();
             $token = make_token($id, 'verify', 86400);

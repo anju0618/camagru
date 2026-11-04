@@ -3,7 +3,7 @@ declare(strict_types=1);
 require __DIR__ . '/../src/bootstrap.php';
 
 $user = require_login();
-$mine = q('SELECT id FROM images WHERE user_id = ? ORDER BY created_at DESC, id DESC', [$user['id']])->fetchAll();
+$mine = db_query('SELECT id FROM images WHERE user_id = ? ORDER BY created_at DESC, id DESC', [$user['id']])->fetchAll();
 render_header('Editor');
 ?>
 <h1>Editor</h1>

@@ -7,7 +7,7 @@ if (is_post()) {
     check_csrf();
     $username = trim(post('username'));
     $password = post('password');
-    $user = q('SELECT * FROM users WHERE username = ?', [$username])->fetch();
+    $user = db_query('SELECT * FROM users WHERE username = ?', [$username])->fetch();
     $error = null;
     if (!$user) {
         password_verify($password, DUMMY_HASH); // same timing whether or not the user exists
@@ -17,13 +17,13 @@ if (is_post()) {
     } elseif (!password_verify($password, $user['password_hash'])) {
         $fails = $user['fail_count'] + 1;
         $locked = $fails >= 5 ? time() + 300 : 0;
-        q('UPDATE users SET fail_count = ?, locked_until = ? WHERE id = ?', [$locked ? 0 : $fails, $locked, $user['id']]);
+        db_query('UPDATE users SET fail_count = ?, locked_until = ? WHERE id = ?', [$locked ? 0 : $fails, $locked, $user['id']]);
         $error = 'Wrong username or password.';
     } elseif (!$user['verified']) {
         $error = 'Please activate your account with the link we emailed you.';
     }
     if (!$error) {
-        q('UPDATE users SET fail_count = 0, locked_until = 0 WHERE id = ?', [$user['id']]);
+        db_query('UPDATE users SET fail_count = 0, locked_until = 0 WHERE id = ?', [$user['id']]);
         login_user($user);
         flash('Welcome back, ' . $user['username'] . '!');
         redirect('/');
