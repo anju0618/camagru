@@ -102,18 +102,25 @@ webカメラで撮った写真(またはアップロードした画像)に、透
 
 ## 6. 構成(推奨)
 
-MVC で分ける(下の説明は会話で書いた)。
+MVC で分ける。ルートには設定と文書だけを置き、メモ類は `docs/` にまとめる(Inception の配置を参考にした)。
 
 ```
-public/        CSS・JS・飾り画像。外から直接見える唯一のフォルダ
-app/main.py      入口(wsgiref の WSGI アプリ)と URL の振り分け
-app/controllers/ リクエストを受けて、Model を呼び、View を選ぶ
-app/models/      DB(sqlite3)とのやり取り、ルール
-app/views/       HTML のテンプレート
-app/lib/         認証・CSRF・メール・PNG の読み書きと合成などの道具
-storage/       アップロード画像(外から直接実行できない場所)
-docker-compose.yml, Dockerfile, .env.example
+camagru/
+├── Makefile, docker-compose.yml, Dockerfile, .env.example
+├── README.md, SPEC.md                (必要なら USER_DOC.md, DEV_DOC.md)
+├── app/
+│   ├── main.py        入口(wsgiref の WSGI アプリ)と URL の振り分け
+│   ├── controllers/   リクエストを受けて、Model を呼び、View を選ぶ
+│   ├── models/        DB(sqlite3)とのやり取り、ルール
+│   ├── views/         HTML のテンプレート
+│   └── lib/           認証・CSRF・メール・PNG/JPEG の読み書きと合成などの道具
+├── public/            CSS・JS・飾り画像。外から直接見える唯一のフォルダ
+├── storage/           アップロード画像(git に入れない。外から直接実行できない場所)
+├── tests/             単体テスト(unittest。画像デコーダーなど)
+└── docs/              個人メモ・補足資料
 ```
+
+自作のイメージが増えたら、`Dockerfile` を `docker/<サービス名>/Dockerfile` に分ける。
 
 ## 7. 決定済み
 
