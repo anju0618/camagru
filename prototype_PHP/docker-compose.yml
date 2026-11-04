@@ -1,0 +1,20 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8002:80"
+    env_file: .env
+    volumes:
+      - data:/var/www/data
+    depends_on:
+      - mailpit
+    restart: unless-stopped
+
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "8027:8025"
+    restart: unless-stopped
+
+volumes:
+  data:

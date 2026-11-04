@@ -1,19 +1,30 @@
-NAME = camagru
+COMPOSE = docker compose
 
 .DEFAULT_GOAL := help
-.PHONY: help build run shell clean
+.PHONY: help up down restart logs ps shell clean fclean
 
 help: ## Show this help
 	@grep -E '^[a-z0-9-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  make %-10s %s\n", $$1, $$2}'
 
-build: ## Build the image
-	docker build -t $(NAME) .
+up: ## Build and start app + mailpit
+	$(COMPOSE) up --build -d
 
-run: build ## Build and run on localhost:8000
-	docker run --rm -p 8000:8000 $(NAME)
+down: ## Stop and remove containers
+	$(COMPOSE) down
 
-shell: build ## Open a shell in the container
-	docker run --rm -it $(NAME) sh
+restart: down up ## Restart everything
 
-clean: ## Remove the image
-	docker rmi $(NAME)
+logs: ## Follow logs
+	$(COMPOSE) logs -f
+
+ps: ## Show containers
+	$(COMPOSE) ps
+
+shell: ## Open a shell in the app container
+	$(COMPOSE) exec app sh
+
+clean: ## Remove containers and images
+	$(COMPOSE) down --rmi local
+
+fclean: ## Also remove volumes (deletes uploads)
+	$(COMPOSE) down --rmi local -v
