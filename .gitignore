@@ -12,6 +12,7 @@ vendor/
 
 # uploads and runtime data
 uploads/
+storage/
 data/
 *.sqlite
 *.db
@@ -24,3 +25,7 @@ db_data/
 .idea/
 *.swp
 .DS_Store
+
+# python
+__pycache__/
+*.pyc

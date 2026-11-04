@@ -1,0 +1,10 @@
+.git
+.env
+secrets/
+storage/
+*.pdf
+.env.*
+__pycache__/
+*.pyc
+Dockerfile
+.dockerignore
